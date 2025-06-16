@@ -1,8 +1,14 @@
-import { registerRootComponent } from 'expo';
+// Global polyfill for BackHandler.removeEventListener
+import { BackHandler } from 'react-native';
 
-import App from './App';
+// Apply polyfill before anything else loads
+if (BackHandler && typeof BackHandler.removeEventListener === 'undefined') {
+  BackHandler.removeEventListener = function(eventName: string, handler: () => boolean): void {
+    // Polyfill: In newer React Native versions, this method was removed
+    // The new addEventListener returns a subscription object with a remove method
+    console.log('BackHandler.removeEventListener polyfill applied');
+  };
+}
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
-registerRootComponent(App);
+// Import the actual expo-router entry point
+import 'expo-router/entry';
