@@ -23,6 +23,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Dimensions, RefreshControl, Animated } from 'react-native';
 import { router } from 'expo-router';
 import { drugAPI } from '../../services/api';
+import FloatingAiAssistant, { FloatingAiButton } from '../../components/FloatingAiAssistant';
 
 const { width } = Dimensions.get('window');
 
@@ -135,6 +136,7 @@ export default function CitizenHomeScreen() {
   const [fadeAnim] = useState(new Animated.Value(1));
   const [recentReports, setRecentReports] = useState<any[]>([]);
   const [isLoadingReports, setIsLoadingReports] = useState(false);
+  const [isAiModalVisible, setIsAiModalVisible] = useState(false);
   const toast = useToast();
 
   const loadRecentReports = async () => {
@@ -768,6 +770,17 @@ export default function CitizenHomeScreen() {
           </Center>
         </Box>
       </ScrollView>
+
+      {/* Floating AI Health Assistant Button */}
+      <FloatingAiButton
+        onPress={() => setIsAiModalVisible(true)}
+      />
+
+      {/* AI Health Assistant Modal */}
+      <FloatingAiAssistant
+        isVisible={isAiModalVisible}
+        onClose={() => setIsAiModalVisible(false)}
+      />
     </Box>
   );
 }

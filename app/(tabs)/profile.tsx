@@ -19,10 +19,17 @@ import {
   Pressable,
   Heading,
   Alert,
+  Avatar,
+  Progress,
+  CheckIcon,
 } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Dimensions, RefreshControl } from 'react-native';
+import { router } from 'expo-router';
 import { drugAPI, DrugReport, CreateDrugReportRequest } from '../../services/api';
 import { TextInput, View, StyleSheet, Animated, KeyboardAvoidingView, Platform } from 'react-native';
+import FloatingAiAssistant, { FloatingAiButton } from '../../components/FloatingAiAssistant';
 
 const issueTypes = [
   { label: 'Counterfeit Drug', value: 'COUNTERFEIT' },
@@ -368,6 +375,7 @@ export default function ReportScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingReports, setIsLoadingReports] = useState(false);
   const [showForm, setShowForm] = useState(true);
+  const [isAiModalVisible, setIsAiModalVisible] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
@@ -629,6 +637,17 @@ export default function ReportScreen() {
             )}
           </VStack>
         </ScrollView>
+
+        {/* Floating AI Health Assistant Button */}
+        <FloatingAiButton
+          onPress={() => setIsAiModalVisible(true)}
+        />
+
+        {/* AI Health Assistant Modal */}
+        <FloatingAiAssistant
+          isVisible={isAiModalVisible}
+          onClose={() => setIsAiModalVisible(false)}
+        />
       </Box>
     </KeyboardAvoidingView>
   );

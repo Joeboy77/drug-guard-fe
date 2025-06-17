@@ -13,17 +13,20 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "axios": "^1.7.2",
     "expo": "~53.0.11",
+    "expo-av": "^15.1.6",
     "expo-barcode-scanner": "^13.0.1",
     "expo-camera": "~16.1.8",
     "expo-linear-gradient": "^14.1.5",
     "expo-router": "~5.1.0",
+    "expo-speech": "^13.1.7",
     "expo-splash-screen": "~0.30.9",
     "expo-status-bar": "~2.2.3",
     "native-base": "^3.4.28",
     "react": "19.0.0",
     "react-native": "0.79.3",
+    "react-native-safe-area-context": "5.4.0",
     "react-native-svg": "^15.11.2",
-    "react-native-safe-area-context": "5.4.0"
+    "expo-linking": "~7.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

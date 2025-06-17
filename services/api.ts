@@ -232,6 +232,27 @@ export interface CreateDrugReportRequest {
   severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 }
 
+// Voice Processing Types
+export interface VoiceRecognitionResult {
+  text: string;
+  confidence: number;
+  language: string;
+}
+
+export interface LanguageInfo {
+  code: string;
+  name: string;
+}
+
+export interface VoiceMessageRequest {
+  text: string;
+  language?: string;
+}
+
+export interface VoiceMessageResponse {
+  message: string;
+}
+
 // API Services
 export const authAPI = {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
@@ -494,6 +515,72 @@ export const analyticsAPI = {
     const response = await api.get('/admin/analytics/export', { params });
     return response.data;
   }
+};
+
+export const voiceAPI = {
+  // Process voice input and convert to text
+  async recognizeVoice(audioFile: File, language: string = 'en'): Promise<VoiceRecognitionResult> {
+    const formData = new FormData();
+    formData.append('audio', audioFile);
+    formData.append('language', language);
+    
+    const response = await api.post('/voice/recognize', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Convert text to speech
+  async textToSpeech(text: string, language: string = 'en'): Promise<Blob> {
+    const response = await api.post('/voice/speak', {
+      text,
+      language,
+    }, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
+
+  // Detect language from text
+  async detectLanguage(text: string): Promise<{ language: string }> {
+    const response = await api.post('/voice/detect-language', { text });
+    return response.data;
+  },
+
+  // Get available languages
+  async getAvailableLanguages(): Promise<LanguageInfo[]> {
+    const response = await api.get('/voice/languages');
+    return response.data;
+  },
+
+  // Get voice message in specified language
+  async getVoiceMessage(language: string, messageType: string, args?: string[]): Promise<VoiceMessageResponse> {
+    const params = new URLSearchParams({
+      language,
+      type: messageType,
+    });
+    
+    if (args && args.length > 0) {
+      args.forEach(arg => params.append('args', arg));
+    }
+    
+    const response = await api.get(`/voice/message?${params.toString()}`);
+    return response.data;
+  },
+
+  // Get drug-related phrases for voice recognition
+  async getDrugPhrases(language: string): Promise<string[]> {
+    const response = await api.get(`/voice/phrases?language=${language}`);
+    return response.data;
+  },
+
+  // Health check
+  async healthCheck(): Promise<{ status: string }> {
+    const response = await api.get('/voice/health');
+    return response.data;
+  },
 };
 
 // Utility functions

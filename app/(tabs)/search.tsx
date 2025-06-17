@@ -24,6 +24,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { drugAPI, Drug } from '../../services/api';
 import { TextInput, View, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import FloatingAiAssistant, { FloatingAiButton } from '../../components/FloatingAiAssistant';
+import VoiceInput from '../../components/VoiceInput';
+import voiceService, { Language } from '../../services/voiceService';
 
 // Enhanced Custom Input component with modern styling
 const CustomInput = forwardRef<TextInput, any>(({ 
@@ -159,7 +162,14 @@ export default function SearchScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDrug, setSelectedDrug] = useState<Drug | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isAiModalVisible, setIsAiModalVisible] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
   const toast = useToast();
+
+  // Initialize voice service
+  useEffect(() => {
+    voiceService.setLanguage(currentLanguage);
+  }, [currentLanguage]);
 
   const handleSearch = useCallback(async () => {
     if (!searchQuery.trim()) {
@@ -177,6 +187,15 @@ export default function SearchScreen() {
     try {
       const response = await drugAPI.searchPublicDrugs(searchQuery.trim());
       setSearchResults(response.content || response || []);
+      
+      // Speak results
+      if (response.content && response.content.length > 0) {
+        const message = voiceService.getSuccessMessage(currentLanguage, searchQuery);
+        await voiceService.speak(message, currentLanguage);
+      } else {
+        const message = voiceService.getNoResultsMessage(currentLanguage);
+        await voiceService.speak(message, currentLanguage);
+      }
     } catch (error) {
       console.error('Search error:', error);
       toast.show({
@@ -184,10 +203,28 @@ export default function SearchScreen() {
         variant: 'error',
       });
       setSearchResults([]);
+      
+      // Speak error message
+      const message = voiceService.getErrorMessage(currentLanguage);
+      await voiceService.speak(message, currentLanguage);
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, toast]);
+  }, [searchQuery, toast, currentLanguage]);
+
+  // Handle voice recognition result
+  const handleVoiceResult = useCallback((text: string) => {
+    setSearchQuery(text);
+    // Auto-search after voice input
+    setTimeout(() => {
+      handleSearch();
+    }, 500);
+  }, [handleSearch]);
+
+  // Handle language change
+  const handleLanguageChange = useCallback((language: Language) => {
+    setCurrentLanguage(language);
+  }, []);
 
   const handleDrugSelect = useCallback((drug: Drug) => {
     setSelectedDrug(drug);
@@ -251,12 +288,10 @@ export default function SearchScreen() {
             borderWidth={1}
             borderColor="gray.100"
             overflow="hidden"
-            transform={isPressed ? [{ scale: 0.98 }] : [{ scale: 1 }]}
-            transition="all 0.2s"
           >
             {/* Header with gradient */}
             <LinearGradient
-              colors={statusColor.bg}
+              colors={statusColor.bg as [string, string]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={{ padding: 16 }}
@@ -343,7 +378,7 @@ export default function SearchScreen() {
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Hero Section */}
           <LinearGradient
-            colors={statusColor.bg}
+            colors={statusColor.bg as [string, string]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ paddingBottom: 40 }}
@@ -550,7 +585,7 @@ export default function SearchScreen() {
         </Box>
       </LinearGradient>
 
-      {/* Enhanced Search Input */}
+      {/* Enhanced Search Input with Voice */}
       <Box bg="white" px={6} py={6} shadow={1}>
         <HStack space={3} alignItems="center">
           <SearchInputWrapper
@@ -559,6 +594,16 @@ export default function SearchScreen() {
             onSubmitEditing={handleSearch}
             isLoading={isLoading}
           />
+          
+          {/* Voice Input */}
+          <VoiceInput
+            onVoiceResult={handleVoiceResult}
+            onLanguageChange={handleLanguageChange}
+            disabled={isLoading}
+            size="md"
+          />
+          
+          {/* Search Button */}
           <Pressable
             onPress={handleSearch}
             disabled={isLoading}
@@ -582,6 +627,14 @@ export default function SearchScreen() {
               </LinearGradient>
             )}
           </Pressable>
+        </HStack>
+        
+        {/* Voice Search Hint */}
+        <HStack space={2} alignItems="center" mt={3} px={2}>
+          <Icon as={Ionicons} name="mic" color="blue.500" size="sm" />
+          <Text fontSize="xs" color="gray.600">
+            Tap the microphone to search by voice
+          </Text>
         </HStack>
       </Box>
 
@@ -666,6 +719,17 @@ export default function SearchScreen() {
           </VStack>
         )}
       </ScrollView>
+
+      {/* Floating AI Health Assistant Button */}
+      <FloatingAiButton
+        onPress={() => setIsAiModalVisible(true)}
+      />
+
+      {/* AI Health Assistant Modal */}
+      <FloatingAiAssistant
+        isVisible={isAiModalVisible}
+        onClose={() => setIsAiModalVisible(false)}
+      />
     </Box>
   );
 }
