@@ -60,13 +60,13 @@ export default function OnboardingScreen() {
         animated: true,
       });
     } else {
-      // Go to user selection
-      router.replace('/user-selection');
+      // Go to citizen home directly
+      router.replace('/(tabs)');
     }
   };
 
   const handleSkip = () => {
-    router.replace('/user-selection');
+    router.replace('/(tabs)');
   };
 
   const handleDotPress = (index: number) => {

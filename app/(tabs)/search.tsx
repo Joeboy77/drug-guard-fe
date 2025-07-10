@@ -639,15 +639,17 @@ export default function SearchScreen() {
       </Box>
 
       {/* Content */}
-      <ScrollView 
-        flex={1} 
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="interactive"
-      >
-        {selectedDrug ? (
+      {selectedDrug ? (
+        <Box flex={1}>
           <DrugDetails drug={selectedDrug} />
-        ) : (
+        </Box>
+      ) : (
+        <ScrollView 
+          flex={1} 
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+        >
           <VStack space={4} py={6}>
             {isLoading ? (
               <Center py={12}>
@@ -665,60 +667,42 @@ export default function SearchScreen() {
                   </VStack>
                 </Box>
               </Center>
-            ) : hasSearched ? (
-              searchResults.length > 0 ? (
-                <VStack space={4}>
-                  <Box px={4}>
-                    <HStack justifyContent="space-between" alignItems="center">
-                      <Text fontSize="lg" fontWeight="600" color="gray.700">
-                        Search Results
-                      </Text>
-                      <Badge colorScheme="blue" variant="subtle" borderRadius="full">
-                        {searchResults.length} found
-                      </Badge>
-                    </HStack>
-                  </Box>
-                  {searchResults.map((drug) => (
-                    <DrugCard key={drug.id} drug={drug} />
-                  ))}
-                </VStack>
-              ) : (
-                <Center py={12}>
-                  <Box bg="white" p={8} borderRadius="2xl" shadow={2} mx={6}>
-                    <VStack space={4} alignItems="center">
-                      <Box bg="red.100" p={6} borderRadius="xl">
-                        <Icon as={Ionicons} name="search-outline" size="4xl" color="red.400" />
-                      </Box>
-                      <Text fontSize="lg" fontWeight="600" color="gray.700" textAlign="center">
-                        No Results Found
-                      </Text>
-                      <Text color="gray.500" textAlign="center" px={4}>
-                        We couldn't find any medications matching your search. Try different keywords or check the spelling.
-                      </Text>
-                    </VStack>
-                  </Box>
-                </Center>
-              )
+            ) : searchResults.length > 0 ? (
+              <VStack space={4}>
+                <Box px={4}>
+                  <HStack justifyContent="space-between" alignItems="center">
+                    <Text fontSize="lg" fontWeight="600" color="gray.700">
+                      Search Results
+                    </Text>
+                    <Badge colorScheme="blue" variant="subtle" borderRadius="full">
+                      {searchResults.length} found
+                    </Badge>
+                  </HStack>
+                </Box>
+                {searchResults.map((drug) => (
+                  <DrugCard key={drug.id} drug={drug} />
+                ))}
+              </VStack>
             ) : (
               <Center py={12}>
                 <Box bg="white" p={8} borderRadius="2xl" shadow={2} mx={6}>
                   <VStack space={4} alignItems="center">
-                    <Box bg="blue.100" p={6} borderRadius="xl">
-                      <Icon as={Ionicons} name="medical-outline" size="4xl" color="blue.400" />
+                    <Box bg="red.100" p={6} borderRadius="xl">
+                      <Icon as={Ionicons} name="search-outline" size="4xl" color="red.400" />
                     </Box>
                     <Text fontSize="lg" fontWeight="600" color="gray.700" textAlign="center">
-                      Welcome to DrugGuard
+                      No Results Found
                     </Text>
                     <Text color="gray.500" textAlign="center" px={4}>
-                      Enter the name of any medication to search our comprehensive FDA database
+                      We couldn't find any medications matching your search. Try different keywords or check the spelling.
                     </Text>
                   </VStack>
                 </Box>
               </Center>
             )}
           </VStack>
-        )}
-      </ScrollView>
+        </ScrollView>
+      )}
 
       {/* Floating AI Health Assistant Button */}
       <FloatingAiButton
