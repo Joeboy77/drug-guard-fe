@@ -360,6 +360,7 @@ const FloatingAiButton = ({ onPress }: { onPress: () => void }) => {
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        accessibilityLabel="Open AI Health Assistant"
       >
         <Animated.View
           style={{
@@ -374,7 +375,7 @@ const FloatingAiButton = ({ onPress }: { onPress: () => void }) => {
             elevation: 12,
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start', // changed to flex-start for custom centering
             overflow: 'hidden',
             transform: [{ scale }],
           }}
@@ -383,17 +384,37 @@ const FloatingAiButton = ({ onPress }: { onPress: () => void }) => {
             colors={['#6366F1', '#8B5CF6']}
             style={styles.gradientBackground}
           />
-          <Icon
-            as={Ionicons}
-            name="medical"
-            size="lg"
-            color="white"
-            style={{ marginRight: 8 }}
-          />
+          {/* Icon always perfectly centered in the circle, regardless of text */}
+          <View
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 32,
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              zIndex: 2,
+            }}
+            pointerEvents="none"
+          >
+            <Icon
+              as={Ionicons}
+              name="chatbubbles"
+              size="2xl"
+              color="white"
+              accessibilityLabel="AI Assistant"
+            />
+          </View>
+          {/* Text slides in, but does not affect icon centering */}
           <Animated.View
             style={{
               opacity: textOpacity,
               transform: [{ translateX: textTranslateX }],
+              marginLeft: 72, // ensures text starts after the icon circle
+              flex: 1,
+              justifyContent: 'center',
             }}
           >
             <Text
